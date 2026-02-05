@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { 
-  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check, Key, Sparkles
+  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check, Key, Sparkles, Globe
 } from 'lucide-react';
 
 import LiveMonitor from './components/LiveMonitor';
@@ -44,6 +44,29 @@ export default function App() {
         setViewMode('sender');
         setHostIdParam(id);
     }
+  }, []);
+
+  // Safe URL Generation
+  const connectionUrl = useMemo(() => {
+    if (!peerId) return '';
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('role', 'sender');
+        url.searchParams.set('id', peerId);
+        return url.toString();
+    } catch (e) {
+        return `${window.location.origin}/?role=sender&id=${peerId}`;
+    }
+  }, [peerId]);
+
+  // Check if running in a private cloud environment
+  const isPrivateEnv = useMemo(() => {
+    const hostname = window.location.hostname;
+    return hostname.includes('usercontent.goog') || 
+           hostname.includes('web.app') || 
+           hostname.includes('idx.dev') ||
+           hostname === 'localhost' ||
+           hostname === '127.0.0.1';
   }, []);
 
   // Handle AI Results
@@ -88,8 +111,7 @@ export default function App() {
   };
 
   const copyLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?role=sender&id=${peerId}`;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(connectionUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -100,7 +122,6 @@ export default function App() {
   }
 
   const t = TRANSLATIONS[language];
-  const connectionUrl = peerId ? `${window.location.origin}${window.location.pathname}?role=sender&id=${peerId}` : '';
   const isDemoMode = !apiKey;
 
   // Render Dashboard View (Teacher PC)
@@ -208,10 +229,18 @@ export default function App() {
         
         {/* Connection Panel (QR Code) - Shows only when active & not connected yet */}
         {isSessionActive && peerId && metricsHistory.length === 0 && (
-            <div className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-6 sm:p-8 mb-8 flex flex-col md:flex-row items-center justify-center gap-8 animate-fade-in shadow-2xl">
-                <div className="bg-white p-3 rounded-xl shadow-lg transform hover:scale-105 transition-transform">
+            <div className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-6 sm:p-8 mb-8 flex flex-col md:flex-row items-center justify-center gap-8 animate-fade-in shadow-2xl relative overflow-hidden">
+                {/* Warning for Private Env */}
+                {isPrivateEnv && (
+                    <div className="absolute top-0 left-0 w-full bg-amber-500/20 text-amber-200 text-xs py-1 px-4 text-center border-b border-amber-500/30 flex items-center justify-center space-x-2">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span>Development Environment Detected. Mobile connection may fail. Deploy to Netlify/Vercel for public access.</span>
+                    </div>
+                )}
+
+                <div className="bg-white p-3 rounded-xl shadow-lg transform hover:scale-105 transition-transform mt-6 md:mt-0">
                     <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(connectionUrl)}`}
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(connectionUrl)}`}
                         alt="Scan to Connect"
                         className="w-48 h-48"
                     />
@@ -226,21 +255,24 @@ export default function App() {
                     </div>
                     
                     <div className="bg-slate-900/80 rounded-lg p-3 border border-slate-700 flex flex-col justify-between group">
-                        <code className="text-xs font-mono text-slate-400 break-all whitespace-pre-wrap block select-all mb-2">
+                        <code className="text-[10px] font-mono text-slate-400 break-all whitespace-pre-wrap block select-all mb-2 leading-relaxed">
                             {connectionUrl}
                         </code>
-                        <button 
-                            onClick={copyLink}
-                            className="self-end p-2 hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-white flex items-center space-x-2"
-                            title="Copy Link"
-                        >
-                            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-                            <span className="text-xs">Copy URL</span>
-                        </button>
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-slate-600">Secure P2P Link</span>
+                            <button 
+                                onClick={copyLink}
+                                className="p-2 hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-white flex items-center space-x-2"
+                                title="Copy Link"
+                            >
+                                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                                <span className="text-xs">Copy URL</span>
+                            </button>
+                        </div>
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-slate-500 bg-slate-900/50 p-2 rounded w-fit">
-                         <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                         <span>Ready for connection (Global P2P)</span>
+                         <Globe className="w-3 h-3 text-green-500" />
+                         <span>Ready for connection</span>
                     </div>
                 </div>
             </div>
