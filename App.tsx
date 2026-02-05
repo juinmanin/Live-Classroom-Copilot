@@ -1,0 +1,291 @@
+import React, { useState, useCallback, useEffect } from 'react';
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+} from 'recharts';
+import { 
+  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check
+} from 'lucide-react';
+
+import LiveMonitor from './components/LiveMonitor';
+import StatCard from './components/StatCard';
+import LanguageSelector from './components/LanguageSelector';
+import MobileSender from './components/MobileSender';
+import { AppLanguage, AIAnalysisResult, ClassroomMetrics } from './types';
+import { TRANSLATIONS } from './constants';
+
+export default function App() {
+  // Routing & View Mode
+  const [viewMode, setViewMode] = useState<'dashboard' | 'sender'>('dashboard');
+  const [hostIdParam, setHostIdParam] = useState<string | null>(null);
+
+  // App State
+  const [apiKey, setApiKey] = useState<string>('');
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [language, setLanguage] = useState<AppLanguage>(AppLanguage.EN);
+  const [showDashboard, setShowDashboard] = useState(true); 
+  const [peerId, setPeerId] = useState<string>(''); 
+  const [copied, setCopied] = useState(false);
+  
+  // Data
+  const [metricsHistory, setMetricsHistory] = useState<ClassroomMetrics[]>([]);
+  const [latestAnalysis, setLatestAnalysis] = useState<AIAnalysisResult | null>(null);
+  
+  // Notification Toast
+  const [notification, setNotification] = useState<{msg: string, type: 'red' | 'yellow' | 'green' | null} | null>(null);
+
+  useEffect(() => {
+    // Check URL parameters for Sender Mode
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role');
+    const id = params.get('id');
+
+    if (role === 'sender' && id) {
+        setViewMode('sender');
+        setHostIdParam(id);
+    }
+  }, []);
+
+  // Handle AI Results
+  const handleAnalysisComplete = useCallback((result: AIAnalysisResult) => {
+    setLatestAnalysis(result);
+    
+    // Update Chart History
+    const newMetric: ClassroomMetrics = {
+      timestamp: Date.now(),
+      engagement: result.metrics.engagement || 50,
+      cognitiveLoad: result.metrics.cognitiveLoad || 50,
+      mood: result.metrics.mood || 'Neutral'
+    };
+
+    setMetricsHistory(prev => {
+      const newHistory = [...prev, newMetric];
+      return newHistory.slice(-20); 
+    });
+
+    // Trigger Notification for Events
+    if (result.alertLevel === 'red' || result.alertLevel === 'yellow') {
+        setNotification({
+            msg: result.action,
+            type: result.alertLevel
+        });
+        setTimeout(() => setNotification(null), 8000);
+    } else {
+        if (notification?.type !== 'green') setNotification(null);
+    }
+
+  }, [notification]);
+
+  const toggleSession = () => {
+    if (!apiKey && !isSessionActive) {
+      alert("Please enter a valid Google Gemini API Key first.");
+      return;
+    }
+    setIsSessionActive(!isSessionActive);
+    if (!isSessionActive) {
+        setShowDashboard(false);
+    } else {
+        setShowDashboard(true);
+        setPeerId('');
+        setNotification(null);
+    }
+  };
+
+  const copyLink = () => {
+    const url = `${window.location.origin}${window.location.pathname}?role=sender&id=${peerId}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Render Mobile Sender View (Phone)
+  if (viewMode === 'sender' && hostIdParam) {
+    return <MobileSender hostId={hostIdParam} />;
+  }
+
+  const t = TRANSLATIONS[language];
+  const connectionUrl = peerId ? `${window.location.origin}${window.location.pathname}?role=sender&id=${peerId}` : '';
+
+  // Render Dashboard View (Teacher PC)
+  return (
+    <div className="min-h-screen bg-[#0f172a] text-slate-200 flex flex-col transition-colors duration-500 font-sans">
+      
+      {/* Alert Notification Toast */}
+      {notification && (
+        <div className={`fixed top-24 left-1/2 transform -translate-x-1/2 z-[100] w-[90%] max-w-2xl p-4 rounded-xl shadow-2xl flex items-center animate-bounce-in border-2 ${
+            notification.type === 'red' ? 'bg-red-900/90 border-red-500 text-white' : 
+            notification.type === 'yellow' ? 'bg-amber-900/90 border-amber-500 text-amber-100' : 'bg-green-900/90 border-green-500'
+        }`}>
+            {notification.type === 'red' ? <AlertTriangle className="w-8 h-8 mr-4 animate-bounce" /> : <Info className="w-8 h-8 mr-4" />}
+            <div>
+                <p className="text-xs uppercase font-bold opacity-80">{t.action}</p>
+                <p className="text-xl font-bold leading-tight">{notification.msg}</p>
+            </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <header className="border-b border-slate-800 bg-[#0f172a]/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="font-bold text-xl tracking-tight text-white hidden sm:block">
+              {t.title} <span className="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full ml-2">Beta</span>
+            </h1>
+          </div>
+          
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            <LanguageSelector 
+              currentLanguage={language} 
+              onLanguageChange={setLanguage}
+              disabled={isSessionActive}
+            />
+            {!isSessionActive && (
+               <input 
+                type="password"
+                placeholder={t.enterKey}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm w-32 sm:w-48 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600"
+               />
+            )}
+            <button
+              onClick={toggleSession}
+              className={`flex items-center space-x-2 px-5 py-2 rounded-lg font-bold text-sm transition-all shadow-lg active:scale-95 ${
+                isSessionActive 
+                  ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30' 
+                  : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/40 hover:shadow-indigo-500/60'
+              }`}
+            >
+              {isSessionActive ? <><Square className="w-4 h-4 fill-current" /><span className="hidden sm:inline">{t.stopSession}</span></> : <><Play className="w-4 h-4 fill-current" /><span className="hidden sm:inline">{t.startSession}</span></>}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 flex flex-col items-center">
+        
+        {/* Connection Panel (QR Code) - Shows only when active & not connected yet */}
+        {isSessionActive && peerId && metricsHistory.length === 0 && (
+            <div className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-6 sm:p-8 mb-8 flex flex-col md:flex-row items-center justify-center gap-8 animate-fade-in shadow-2xl">
+                <div className="bg-white p-3 rounded-xl shadow-lg transform hover:scale-105 transition-transform">
+                    <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(connectionUrl)}`}
+                        alt="Scan to Connect"
+                        className="w-48 h-48"
+                    />
+                </div>
+                <div className="text-center md:text-left max-w-md space-y-4">
+                    <div>
+                        <h3 className="text-2xl font-bold text-white mb-2">{t.scanQR}</h3>
+                        <p className="text-slate-300">
+                           Open your phone's camera and scan the code to connect.
+                           <br/><span className="text-indigo-400 text-sm">No app installation required.</span>
+                        </p>
+                    </div>
+                    
+                    <div className="bg-slate-900/80 rounded-lg p-3 border border-slate-700 flex items-center justify-between group">
+                        <code className="text-xs font-mono text-slate-400 truncate max-w-[200px] sm:max-w-xs block">
+                            {connectionUrl}
+                        </code>
+                        <button 
+                            onClick={copyLink}
+                            className="ml-3 p-2 hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-white relative"
+                            title="Copy Link"
+                        >
+                            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs text-slate-500 bg-slate-900/50 p-2 rounded w-fit">
+                         <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                         <span>Ready for connection (Global P2P)</span>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Live Monitor Feed */}
+        <div className={`w-full transition-all duration-700 ease-in-out ${showDashboard ? 'h-[300px] sm:h-[400px]' : 'h-[60vh] sm:h-[70vh]'} mb-6 relative z-10`}>
+            <LiveMonitor 
+                isActive={isSessionActive} 
+                apiKey={apiKey}
+                language={language}
+                onAnalysisComplete={handleAnalysisComplete}
+                onPeerIdGenerated={setPeerId}
+            />
+        </div>
+
+        {/* Minimal Mode Toggle */}
+        {isSessionActive && (
+            <button 
+                onClick={() => setShowDashboard(!showDashboard)}
+                className="mb-8 flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm bg-slate-900/50 border border-slate-800 px-5 py-2 rounded-full shadow-lg"
+            >
+                {showDashboard ? <><ChevronUp className="w-4 h-4" /><span>{t.hideStats}</span></> : <><ChevronDown className="w-4 h-4" /><span>{t.showStats}</span></>}
+            </button>
+        )}
+
+        {/* Dashboard / Metrics (Collapsible) */}
+        {showDashboard && (
+            <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up pb-10">
+                
+                {/* Insights Column */}
+                <div className="lg:col-span-1 space-y-4">
+                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-6 border border-slate-700 shadow-xl h-full flex flex-col">
+                        <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-wider mb-4 flex items-center">
+                            <Brain className="w-3 h-3 mr-2" />
+                            {t.insight}
+                        </h3>
+                        <p className="text-white text-lg font-medium leading-relaxed flex-grow">
+                            {latestAnalysis?.insight || "Waiting for classroom data..."}
+                        </p>
+                        <div className="mt-6 pt-4 border-t border-slate-700 flex items-center justify-between">
+                            <span className="text-slate-500 text-xs font-medium uppercase tracking-wide">{t.mood}</span>
+                            <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-sm font-semibold border border-indigo-500/20">
+                                {latestAnalysis?.metrics?.mood ?? '-'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Metrics & Chart Column */}
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <StatCard 
+                            title={t.engagement}
+                            value={latestAnalysis?.metrics?.engagement ?? 0}
+                            color="text-indigo-400"
+                        />
+                        <StatCard 
+                            title={t.load}
+                            value={latestAnalysis?.metrics?.cognitiveLoad ?? 0}
+                            color="text-pink-400"
+                        />
+                    </div>
+
+                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-5 border border-slate-700 shadow-xl h-[240px]">
+                        <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">Live Trends (Last 5 min)</h3>
+                        <div className="h-full pb-8">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={metricsHistory}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.5} />
+                                    <XAxis dataKey="timestamp" hide />
+                                    <YAxis domain={[0, 100]} hide />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#fff', borderRadius: '8px' }}
+                                    />
+                                    <Line type="monotone" dataKey="engagement" stroke="#818cf8" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                                    <Line type="monotone" dataKey="cognitiveLoad" stroke="#f472b6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
+      </main>
+    </div>
+  );
+}

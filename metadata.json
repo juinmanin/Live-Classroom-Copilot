@@ -1,0 +1,8 @@
+{
+  "name": "Live Classroom Copilot",
+  "description": "Real-time multimodal AI pedagogical assistant ensuring student privacy with edge-based processing.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
