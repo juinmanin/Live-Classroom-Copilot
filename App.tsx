@@ -225,16 +225,17 @@ export default function App() {
                         </p>
                     </div>
                     
-                    <div className="bg-slate-900/80 rounded-lg p-3 border border-slate-700 flex items-center justify-between group">
-                        <code className="text-xs font-mono text-slate-400 truncate max-w-[200px] sm:max-w-xs block">
+                    <div className="bg-slate-900/80 rounded-lg p-3 border border-slate-700 flex flex-col justify-between group">
+                        <code className="text-xs font-mono text-slate-400 break-all whitespace-pre-wrap block select-all mb-2">
                             {connectionUrl}
                         </code>
                         <button 
                             onClick={copyLink}
-                            className="ml-3 p-2 hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-white relative"
+                            className="self-end p-2 hover:bg-slate-700 rounded-md transition-colors text-slate-400 hover:text-white flex items-center space-x-2"
                             title="Copy Link"
                         >
                             {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                            <span className="text-xs">Copy URL</span>
                         </button>
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-slate-500 bg-slate-900/50 p-2 rounded w-fit">
