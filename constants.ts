@@ -18,7 +18,8 @@ export const TRANSLATIONS = {
     title: "Live Classroom Copilot",
     startSession: "Start Session",
     stopSession: "Stop Session",
-    enterKey: "Enter Gemini API Key",
+    tryDemo: "Try Demo Mode",
+    enterKey: "Enter Gemini API Key (Optional for Demo)",
     connecting: "Connecting...",
     scanQR: "Scan to Connect Camera",
     waitingForPhone: "Waiting for mobile connection...",
@@ -35,13 +36,15 @@ export const TRANSLATIONS = {
     privacyActive: "Privacy Shield Active",
     statusGreen: "Class is flowing well",
     statusYellow: "Attention Needed",
-    statusRed: "Intervention Required"
+    statusRed: "Intervention Required",
+    demoBadge: "Simulated Demo"
   },
   [AppLanguage.KO]: {
     title: "실시간 교실 코파일럿",
     startSession: "세션 시작",
     stopSession: "세션 종료",
-    enterKey: "Gemini API 키 입력",
+    tryDemo: "데모 체험하기",
+    enterKey: "Gemini API 키 입력 (데모 시 불필요)",
     connecting: "연결 중...",
     scanQR: "카메라 연결을 위해 스캔하세요",
     waitingForPhone: "모바일 연결 대기 중...",
@@ -58,13 +61,15 @@ export const TRANSLATIONS = {
     privacyActive: "프라이버시 보호 중",
     statusGreen: "수업이 원활합니다",
     statusYellow: "주의가 필요합니다",
-    statusRed: "개입이 필요합니다"
+    statusRed: "개입이 필요합니다",
+    demoBadge: "시뮬레이션 모드"
   },
   [AppLanguage.JA]: {
     title: "ライブ教室コパイロット",
     startSession: "セッション開始",
     stopSession: "セッション終了",
-    enterKey: "Gemini APIキーを入力",
+    tryDemo: "デモを試す",
+    enterKey: "Gemini APIキー (デモは不要)",
     connecting: "接続中...",
     scanQR: "カメラ接続のためにスキャン",
     waitingForPhone: "モバイル接続待機中...",
@@ -81,13 +86,15 @@ export const TRANSLATIONS = {
     privacyActive: "プライバシー保護中",
     statusGreen: "順調に進行中",
     statusYellow: "注意が必要です",
-    statusRed: "介入が必要です"
+    statusRed: "介入が必要です",
+    demoBadge: "シミュレーション"
   },
   [AppLanguage.ZH]: {
     title: "实时课堂助手",
     startSession: "开始会话",
     stopSession: "停止会话",
-    enterKey: "输入 Gemini API 密钥",
+    tryDemo: "试用演示模式",
+    enterKey: "Gemini API 密钥 (演示无需)",
     connecting: "连接中...",
     scanQR: "扫描连接摄像头",
     waitingForPhone: "等待手机连接...",
@@ -104,13 +111,15 @@ export const TRANSLATIONS = {
     privacyActive: "隐私保护已激活",
     statusGreen: "课堂进行顺利",
     statusYellow: "需要注意",
-    statusRed: "需要干预"
+    statusRed: "需要干预",
+    demoBadge: "模拟演示"
   },
   [AppLanguage.ES]: {
     title: "Copiloto de Aula en Vivo",
     startSession: "Iniciar Sesión",
     stopSession: "Detener Sesión",
-    enterKey: "Clave API de Gemini",
+    tryDemo: "Probar Demo",
+    enterKey: "Clave API (Opcional)",
     connecting: "Conectando...",
     scanQR: "Escanear para conectar cámara",
     waitingForPhone: "Esperando conexión móvil...",
@@ -127,13 +136,15 @@ export const TRANSLATIONS = {
     privacyActive: "Escudo de Privacidad",
     statusGreen: "La clase fluye bien",
     statusYellow: "Atención Necesaria",
-    statusRed: "Intervención Requerida"
+    statusRed: "Intervención Requerida",
+    demoBadge: "Modo Simulado"
   },
   [AppLanguage.FR]: {
     title: "Copilote de Classe en Direct",
     startSession: "Démarrer Session",
     stopSession: "Arrêter Session",
-    enterKey: "Clé API Gemini",
+    tryDemo: "Mode Démo",
+    enterKey: "Clé API (Optionnel)",
     connecting: "Connexion...",
     scanQR: "Scanner pour connecter la caméra",
     waitingForPhone: "En attente du mobile...",
@@ -150,13 +161,15 @@ export const TRANSLATIONS = {
     privacyActive: "Protection Vie Privée",
     statusGreen: "Le cours se déroule bien",
     statusYellow: "Attention Requise",
-    statusRed: "Intervention Requise"
+    statusRed: "Intervention Requise",
+    demoBadge: "Simulation"
   },
   [AppLanguage.HI]: {
     title: "लाइव क्लासरूम कोपायलट",
     startSession: "सत्र शुरू करें",
     stopSession: "सत्र रोकें",
-    enterKey: "जेमिनी API कुंजी दर्ज करें",
+    tryDemo: "डेमो आज़माएं",
+    enterKey: "API कुंजी (वैकल्पिक)",
     connecting: "कनेक्ट हो रहा है...",
     scanQR: "कैमरा कनेक्ट करने के लिए स्कैन करें",
     waitingForPhone: "मोबाइल कनेक्शन की प्रतीक्षा है...",
@@ -173,7 +186,8 @@ export const TRANSLATIONS = {
     privacyActive: "गोपनीयता शील्ड सक्रिय",
     statusGreen: "कक्षा अच्छी चल रही है",
     statusYellow: "ध्यान देने की आवश्यकता है",
-    statusRed: "हस्तक्षेप आवश्यक"
+    statusRed: "हस्तक्षेप आवश्यक",
+    demoBadge: "सिमुलेशन मोड"
   }
 };
 
@@ -204,3 +218,55 @@ Your response language must be: {{LANGUAGE}}.
   "alertLevel": "green" | "yellow" | "red"
 }
 `;
+
+// Mock Scenarios for Demo Mode (Looping sequence)
+export const MOCK_SCENARIOS = [
+  {
+    engagement: 85,
+    cognitiveLoad: 40,
+    mood: "Focused",
+    alertLevel: "green",
+    insight: "Students are attentively listening to the lecture.",
+    action: "Great time to introduce a key concept."
+  },
+  {
+    engagement: 70,
+    cognitiveLoad: 60,
+    mood: "Curious",
+    alertLevel: "green",
+    insight: "Some students are taking notes, good flow.",
+    action: "Maintain this pace."
+  },
+  {
+    engagement: 55,
+    cognitiveLoad: 30,
+    mood: "Restless",
+    alertLevel: "yellow",
+    insight: "Attention is starting to drift in the back rows.",
+    action: "Try asking a question to re-engage the class."
+  },
+  {
+    engagement: 40,
+    cognitiveLoad: 20,
+    mood: "Bored",
+    alertLevel: "yellow",
+    insight: "Energy level has dropped significantly.",
+    action: "Time for a quick stretch or an interactive activity."
+  },
+  {
+    engagement: 80,
+    cognitiveLoad: 75,
+    mood: "Intense",
+    alertLevel: "green",
+    insight: "Students are working hard on the problem.",
+    action: "Walk around and offer individual support."
+  },
+  {
+    engagement: 30,
+    cognitiveLoad: 80,
+    mood: "Confused",
+    alertLevel: "red",
+    insight: "Many students look puzzled by the last explanation.",
+    action: "Pause and re-explain the concept with a simpler example."
+  }
+];

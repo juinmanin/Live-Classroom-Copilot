@@ -1,18 +1,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { MODEL_NAME, SYSTEM_PROMPT_TEMPLATE } from "../constants";
+import { MODEL_NAME, SYSTEM_PROMPT_TEMPLATE, MOCK_SCENARIOS } from "../constants";
 import { AppLanguage, AIAnalysisResult } from "../types";
 
 export class GeminiService {
   private ai: GoogleGenAI | null = null;
   private apiKey: string;
+  private mockIndex: number = 0;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
-    // We initialize per request or update if needed, but here we constructor inject
-    try {
-        this.ai = new GoogleGenAI({ apiKey: this.apiKey });
-    } catch (error) {
-        console.error("Failed to initialize Gemini:", error);
+    if (this.apiKey) {
+        try {
+            this.ai = new GoogleGenAI({ apiKey: this.apiKey });
+        } catch (error) {
+            console.error("Failed to initialize Gemini:", error);
+        }
     }
   }
 
@@ -21,13 +23,14 @@ export class GeminiService {
     language: AppLanguage,
     recentContext: string
   ): Promise<AIAnalysisResult> {
-    if (!this.ai) {
-      throw new Error("Gemini AI not initialized. Check API Key.");
+    
+    // DEMO MODE: If no API key is provided, run the simulation
+    if (!this.apiKey || !this.ai) {
+        return this.generateMockResponse(language);
     }
 
     const systemInstruction = SYSTEM_PROMPT_TEMPLATE.replace('{{LANGUAGE}}', language);
     
-    // Construct the user prompt with context
     const userPrompt = `
       Analyze this live classroom frame.
       Recent Context (last 5 mins): ${recentContext}
@@ -49,7 +52,7 @@ export class GeminiService {
             config: {
                 systemInstruction: systemInstruction,
                 responseMimeType: "application/json",
-                temperature: 0.5, // Lower temperature for consistent analysis
+                temperature: 0.5, 
                 responseSchema: {
                     type: Type.OBJECT,
                     properties: {
@@ -84,18 +87,33 @@ export class GeminiService {
 
     } catch (error) {
         console.error("Gemini Analysis Error:", error);
-        // Fallback for demo purposes if API fails
-        return {
-            metrics: {
-                timestamp: Date.now(),
-                engagement: 50,
-                cognitiveLoad: 50,
-                mood: "Analyzing..."
-            },
-            insight: "System is recalibrating...",
-            action: "Maintain current pace.",
-            alertLevel: "yellow"
-        };
+        // Fallback to mock on error
+        return this.generateMockResponse(language);
     }
+  }
+
+  // Realistic Simulation for Demo Mode
+  private async generateMockResponse(language: AppLanguage): Promise<AIAnalysisResult> {
+    // Simulate network latency
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    const scenario = MOCK_SCENARIOS[this.mockIndex];
+    this.mockIndex = (this.mockIndex + 1) % MOCK_SCENARIOS.length;
+
+    // TODO: Implement proper translation logic for mock data if needed. 
+    // For now, we return English mock data or simple static translations could be mapped here.
+    // In a full app, MOCK_SCENARIOS should be localized in constants.ts
+
+    return {
+        metrics: {
+            timestamp: Date.now(),
+            engagement: scenario.engagement + (Math.random() * 10 - 5), // Add slight jitter
+            cognitiveLoad: scenario.cognitiveLoad + (Math.random() * 10 - 5),
+            mood: scenario.mood
+        },
+        insight: scenario.insight,
+        action: scenario.action,
+        alertLevel: scenario.alertLevel as 'green' | 'yellow' | 'red'
+    };
   }
 }
