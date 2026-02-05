@@ -10,7 +10,7 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'hi', label: 'हिन्दी (Hindi)', value: AppLanguage.HI },
 ];
 
-export const MODEL_NAME = 'gemini-3-flash-preview';
+export const MODEL_NAME = 'gemini-2.5-flash';
 
 // UI Translations
 export const TRANSLATIONS = {

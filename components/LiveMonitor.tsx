@@ -29,11 +29,9 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
   const [geminiService, setGeminiService] = useState<GeminiService | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'waiting' | 'connected'>('disconnected');
 
-  // 1. Initialize Gemini Service
+  // 1. Initialize Gemini Service (also for demo mode without API key)
   useEffect(() => {
-    if (apiKey) {
-      setGeminiService(new GeminiService(apiKey));
-    }
+    setGeminiService(new GeminiService(apiKey));
   }, [apiKey]);
 
   // 2. Initialize PeerJS (Receiver) with STUN Config
@@ -77,7 +75,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
 
   // 3. AI Processing Loop
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: ReturnType<typeof setInterval>;
 
     if (isActive && connectionStatus === 'connected' && geminiService) {
       intervalId = setInterval(() => {
