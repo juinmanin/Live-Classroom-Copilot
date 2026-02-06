@@ -65,6 +65,7 @@ export default function App() {
     return hostname.includes('usercontent.goog') || 
            hostname.includes('web.app') || 
            hostname.includes('idx.dev') ||
+           hostname.includes('vercel.app') ||
            hostname === 'localhost' ||
            hostname === '127.0.0.1';
   }, []);
