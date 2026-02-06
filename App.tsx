@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { 
-  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check, Key, Sparkles, Globe
+  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check, Sparkles, Globe, Wifi
 } from 'lucide-react';
 
 import LiveMonitor from './components/LiveMonitor';
@@ -19,8 +19,6 @@ export default function App() {
   const [hostIdParam, setHostIdParam] = useState<string | null>(null);
 
   // App State
-  const [apiKey, setApiKey] = useState<string>('');
-  const [showKeyInput, setShowKeyInput] = useState(false); // Toggle for API Key input
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [language, setLanguage] = useState<AppLanguage>(AppLanguage.EN);
   const [showDashboard, setShowDashboard] = useState(true); 
@@ -122,7 +120,7 @@ export default function App() {
   }
 
   const t = TRANSLATIONS[language];
-  const isDemoMode = !apiKey;
+  const isDemoMode = !process.env.API_KEY;
 
   // Render Dashboard View (Teacher PC)
   return (
@@ -161,40 +159,12 @@ export default function App() {
               disabled={isSessionActive}
             />
             
-            {/* Key Input Toggle */}
-            {!isSessionActive && (
-               <div className="relative">
-                 <button 
-                    onClick={() => setShowKeyInput(!showKeyInput)}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
-                    title="Setup API Key"
-                 >
-                    <Key className="w-5 h-5" />
-                 </button>
-                 {showKeyInput && (
-                    <div className="absolute top-10 right-0 bg-slate-800 border border-slate-700 p-3 rounded-xl shadow-2xl z-50 flex flex-col w-64 animate-fade-in">
-                        <label className="text-xs text-slate-400 mb-1 ml-1">Google Gemini API Key</label>
-                        <input 
-                            type="password"
-                            placeholder="Paste key for real AI..."
-                            value={apiKey}
-                            onChange={(e) => setApiKey(e.target.value)}
-                            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none placeholder:text-slate-600"
-                        />
-                        <p className="text-[10px] text-slate-500 mt-2 px-1">
-                            Leave empty to run in <b>Simulation Mode</b>.
-                        </p>
-                    </div>
-                 )}
-               </div>
-            )}
-
             <button
               onClick={toggleSession}
               className={`flex items-center space-x-2 px-5 py-2 rounded-lg font-bold text-sm transition-all shadow-lg active:scale-95 ${
                 isSessionActive 
                   ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30' 
-                  : apiKey 
+                  : !isDemoMode 
                     ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/40 hover:shadow-indigo-500/60'
                     : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/40 hover:shadow-emerald-500/60'
               }`}
@@ -206,8 +176,8 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  {apiKey ? <Play className="w-4 h-4 fill-current" /> : <Sparkles className="w-4 h-4 fill-current" />}
-                  <span className="hidden sm:inline">{apiKey ? t.startSession : t.tryDemo}</span>
+                  {!isDemoMode ? <Play className="w-4 h-4 fill-current" /> : <Sparkles className="w-4 h-4 fill-current" />}
+                  <span className="hidden sm:inline">{!isDemoMode ? t.startSession : t.tryDemo}</span>
                 </>
               )}
             </button>
@@ -230,11 +200,25 @@ export default function App() {
         {/* Connection Panel (QR Code) - Shows only when active & not connected yet */}
         {isSessionActive && peerId && metricsHistory.length === 0 && (
             <div className="w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-6 sm:p-8 mb-8 flex flex-col md:flex-row items-center justify-center gap-8 animate-fade-in shadow-2xl relative overflow-hidden">
-                {/* Warning for Private Env */}
+                
+                {/* Critical Warning for Private Env */}
                 {isPrivateEnv && (
-                    <div className="absolute top-0 left-0 w-full bg-amber-500/20 text-amber-200 text-xs py-1 px-4 text-center border-b border-amber-500/30 flex items-center justify-center space-x-2">
-                        <AlertTriangle className="w-3 h-3" />
-                        <span>Development Environment Detected. Mobile connection may fail. Deploy to Netlify/Vercel for public access.</span>
+                    <div className="absolute inset-0 z-50 bg-slate-900/95 flex flex-col items-center justify-center text-center p-6 backdrop-blur-sm">
+                        <AlertTriangle className="w-12 h-12 text-amber-500 mb-4 animate-bounce" />
+                        <h3 className="text-xl font-bold text-white mb-2">Setup Required for Mobile</h3>
+                        <p className="text-slate-300 max-w-md mb-6">
+                            You are currently viewing a <b>private development preview</b>. 
+                            Your phone cannot connect to this URL (`{window.location.hostname}`).
+                        </p>
+                        <div className="flex flex-col gap-3 w-full max-w-xs">
+                             <a href="https://app.netlify.com/start" target="_blank" rel="noreferrer" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-lg font-bold flex items-center justify-center space-x-2 transition-all">
+                                <Globe className="w-5 h-5" />
+                                <span>Deploy to Netlify (Free)</span>
+                             </a>
+                             <p className="text-xs text-slate-500 mt-2">
+                                After deploying, open the <b>Netlify URL</b> to scan the QR code.
+                             </p>
+                        </div>
                     </div>
                 )}
 
@@ -271,7 +255,7 @@ export default function App() {
                         </div>
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-slate-500 bg-slate-900/50 p-2 rounded w-fit">
-                         <Globe className="w-3 h-3 text-green-500" />
+                         <Wifi className="w-3 h-3 text-green-500" />
                          <span>Ready for connection</span>
                     </div>
                 </div>
@@ -282,7 +266,6 @@ export default function App() {
         <div className={`w-full transition-all duration-700 ease-in-out ${showDashboard ? 'h-[300px] sm:h-[400px]' : 'h-[60vh] sm:h-[70vh]'} mb-6 relative z-10`}>
             <LiveMonitor 
                 isActive={isSessionActive} 
-                apiKey={apiKey}
                 language={language}
                 onAnalysisComplete={handleAnalysisComplete}
                 onPeerIdGenerated={setPeerId}

@@ -25,5 +25,5 @@ export enum AppLanguage {
 export interface AppState {
   isSessionActive: boolean;
   language: AppLanguage;
-  apiKey: string | null;
+  // apiKey removed from state as it must come from env
 }

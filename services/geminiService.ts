@@ -4,14 +4,13 @@ import { AppLanguage, AIAnalysisResult } from "../types";
 
 export class GeminiService {
   private ai: GoogleGenAI | null = null;
-  private apiKey: string;
   private mockIndex: number = 0;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    if (this.apiKey) {
+  constructor() {
+    const apiKey = process.env.API_KEY;
+    if (apiKey) {
         try {
-            this.ai = new GoogleGenAI({ apiKey: this.apiKey });
+            this.ai = new GoogleGenAI({ apiKey });
         } catch (error) {
             console.error("Failed to initialize Gemini:", error);
         }
@@ -25,7 +24,7 @@ export class GeminiService {
   ): Promise<AIAnalysisResult> {
     
     // DEMO MODE: If no API key is provided, run the simulation
-    if (!this.apiKey || !this.ai) {
+    if (!this.ai) {
         return this.generateMockResponse(language);
     }
 

@@ -8,7 +8,6 @@ import { PEER_CONFIG } from '../utils/peerConfig';
 
 interface LiveMonitorProps {
   isActive: boolean;
-  apiKey: string;
   language: AppLanguage;
   onAnalysisComplete: (result: AIAnalysisResult) => void;
   onPeerIdGenerated: (id: string) => void;
@@ -16,7 +15,6 @@ interface LiveMonitorProps {
 
 const LiveMonitor: React.FC<LiveMonitorProps> = ({
   isActive,
-  apiKey,
   language,
   onAnalysisComplete,
   onPeerIdGenerated
@@ -31,10 +29,8 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
 
   // 1. Initialize Gemini Service
   useEffect(() => {
-    if (apiKey) {
-      setGeminiService(new GeminiService(apiKey));
-    }
-  }, [apiKey]);
+    setGeminiService(new GeminiService());
+  }, []);
 
   // 2. Initialize PeerJS (Receiver) with STUN Config
   useEffect(() => {
@@ -77,7 +73,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
 
   // 3. AI Processing Loop
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: any;
 
     if (isActive && connectionStatus === 'connected' && geminiService) {
       intervalId = setInterval(() => {
