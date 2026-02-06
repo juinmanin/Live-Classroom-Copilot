@@ -23,6 +23,8 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const displayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const displayAnimRef = useRef<number>(0);
   const [peer, setPeer] = useState<Peer | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -72,6 +74,41 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
+
+  // 2.5. Privacy Blur Display Loop - renders blurred video to visible canvas
+  useEffect(() => {
+    if (connectionStatus !== 'connected' || !videoRef.current || !displayCanvasRef.current) {
+      return;
+    }
+
+    const video = videoRef.current;
+    const displayCanvas = displayCanvasRef.current;
+    const ctx = displayCanvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size via ResizeObserver
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        displayCanvas.width = entry.contentRect.width;
+        displayCanvas.height = entry.contentRect.height;
+      }
+    });
+    resizeObserver.observe(displayCanvas);
+
+    const renderFrame = () => {
+      if (video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, displayCanvas.width, displayCanvas.height);
+      }
+      displayAnimRef.current = requestAnimationFrame(renderFrame);
+    };
+
+    displayAnimRef.current = requestAnimationFrame(renderFrame);
+
+    return () => {
+      cancelAnimationFrame(displayAnimRef.current);
+      resizeObserver.disconnect();
+    };
+  }, [connectionStatus]);
 
   // 3. AI Processing Loop
   useEffect(() => {
@@ -127,16 +164,33 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
 
   return (
     <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-700 group">
-      {/* Video Feed */}
+      {/* Video Feed (hidden - only used for frame capture) */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className={`w-full h-full object-cover transition-opacity duration-500 ${remoteStream ? 'opacity-100' : 'opacity-30'}`}
+        className="hidden"
       />
       
+      {/* Privacy-Blurred Display Canvas (CSS blur for performance) */}
+      <canvas ref={displayCanvasRef} className={`w-full h-full object-cover transition-opacity duration-500 blur-[16px] saturate-[1.2] ${remoteStream ? 'opacity-100' : 'opacity-30'}`} />
+      
+      {/* AI Processing Canvas (hidden) */}
       <canvas ref={canvasRef} className="hidden" />
+
+      {/* Animated Privacy Overlay */}
+      {connectionStatus === 'connected' && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Scanning line animation */}
+          <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent animate-scan-line" />
+          {/* Grid overlay */}
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.3) 1px, transparent 1px)',
+            backgroundSize: '40px 40px'
+          }} />
+        </div>
+      )}
 
       {/* Connection Status Overlay */}
       {isActive && connectionStatus === 'waiting' && (

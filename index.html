@@ -27,6 +27,16 @@
         background: #334155;
         border-radius: 4px;
       }
+      /* Privacy scan line animation */
+      @keyframes scanLine {
+        0% { top: 0; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+      .animate-scan-line {
+        animation: scanLine 3s ease-in-out infinite;
+      }
     </style>
   <script type="importmap">
 {

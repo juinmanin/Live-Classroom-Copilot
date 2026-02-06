@@ -107,8 +107,8 @@ export class GeminiService {
     return {
         metrics: {
             timestamp: Date.now(),
-            engagement: scenario.engagement + (Math.random() * 10 - 5), // Add slight jitter
-            cognitiveLoad: scenario.cognitiveLoad + (Math.random() * 10 - 5),
+            engagement: Math.round(scenario.engagement + (Math.random() * 10 - 5)),
+            cognitiveLoad: Math.round(scenario.cognitiveLoad + (Math.random() * 10 - 5)),
             mood: scenario.mood
         },
         insight: scenario.insight,
