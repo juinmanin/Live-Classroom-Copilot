@@ -77,7 +77,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
 
   // 3. AI Processing Loop
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: number;
 
     if (isActive && connectionStatus === 'connected' && geminiService) {
       intervalId = setInterval(() => {
