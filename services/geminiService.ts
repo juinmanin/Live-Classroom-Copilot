@@ -2,6 +2,16 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { MODEL_NAME, SYSTEM_PROMPT_TEMPLATE, MOCK_SCENARIOS } from "../constants";
 import { AppLanguage, AIAnalysisResult, Sensitivity } from "../types";
 
+const ZONE_ITEM_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    zone: { type: Type.NUMBER },
+    engagement: { type: Type.NUMBER },
+    behavior: { type: Type.STRING }
+  },
+  required: ["zone", "engagement", "behavior"] as string[]
+};
+
 export class GeminiService {
   private ai: GoogleGenAI | null = null;
   private apiKey: string;
@@ -44,16 +54,6 @@ export class GeminiService {
       Provide the JSON analysis with 9-zone grid scores.
     `;
 
-    const zoneItemSchema = {
-      type: Type.OBJECT,
-      properties: {
-        zone: { type: Type.NUMBER },
-        engagement: { type: Type.NUMBER },
-        behavior: { type: Type.STRING }
-      },
-      required: ["zone", "engagement", "behavior"] as string[]
-    };
-
     try {
         const response = await this.ai.models.generateContent({
             model: MODEL_NAME,
@@ -73,7 +73,7 @@ export class GeminiService {
                         engagement: { type: Type.NUMBER },
                         cognitiveLoad: { type: Type.NUMBER },
                         mood: { type: Type.STRING },
-                        zones: { type: Type.ARRAY, items: zoneItemSchema },
+                        zones: { type: Type.ARRAY, items: ZONE_ITEM_SCHEMA },
                         insight: { type: Type.STRING },
                         action: { type: Type.STRING },
                         alertLevel: { type: Type.STRING, enum: ["green", "yellow", "red"] }

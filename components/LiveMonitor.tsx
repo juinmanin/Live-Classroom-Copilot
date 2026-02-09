@@ -193,25 +193,28 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
           <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent animate-scan-line" />
           {/* 3x3 Zone Grid Overlay */}
           <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
-            {Array.from({ length: 9 }, (_, i) => {
-              const zoneData = zones.find(z => z.zone === i + 1);
-              const eng = zoneData?.engagement ?? 0;
-              const behavior = zoneData?.behavior ?? '';
-              const bgColor = eng >= 70 ? 'bg-green-500/10' : eng >= 40 ? 'bg-amber-500/10' : 'bg-red-500/10';
-              const borderColor = eng >= 70 ? 'border-green-400/30' : eng >= 40 ? 'border-amber-400/30' : 'border-red-400/30';
-              const textColor = eng >= 70 ? 'text-green-400' : eng >= 40 ? 'text-amber-400' : 'text-red-400';
-              return (
-                <div key={i} className={`relative border ${borderColor} ${zones.length > 0 ? bgColor : ''} flex items-center justify-center transition-colors duration-500`}>
-                  {zones.length > 0 && (
-                    <div className="flex flex-col items-center">
-                      <span className={`text-lg sm:text-2xl font-bold ${textColor} drop-shadow-lg`}>{eng}%</span>
-                      <span className="text-[9px] sm:text-[10px] text-white/60 uppercase tracking-wider mt-0.5">{behavior}</span>
-                    </div>
-                  )}
-                  <span className="absolute top-1 left-1.5 text-[9px] text-white/30 font-mono">Z{i + 1}</span>
-                </div>
-              );
-            })}
+            {(() => {
+              const zoneMap = new Map(zones.map(z => [z.zone, z]));
+              return Array.from({ length: 9 }, (_, i) => {
+                const zoneData = zoneMap.get(i + 1);
+                const eng = zoneData?.engagement ?? 0;
+                const behavior = zoneData?.behavior ?? '';
+                const bgColor = eng >= 70 ? 'bg-green-500/10' : eng >= 40 ? 'bg-amber-500/10' : 'bg-red-500/10';
+                const borderColor = eng >= 70 ? 'border-green-400/30' : eng >= 40 ? 'border-amber-400/30' : 'border-red-400/30';
+                const textColor = eng >= 70 ? 'text-green-400' : eng >= 40 ? 'text-amber-400' : 'text-red-400';
+                return (
+                  <div key={i} className={`relative border ${borderColor} ${zones.length > 0 ? bgColor : ''} flex items-center justify-center transition-colors duration-500`}>
+                    {zones.length > 0 && (
+                      <div className="flex flex-col items-center">
+                        <span className={`text-lg sm:text-2xl font-bold ${textColor} drop-shadow-lg`}>{eng}%</span>
+                        <span className="text-[9px] sm:text-[10px] text-white/60 uppercase tracking-wider mt-0.5">{behavior}</span>
+                      </div>
+                    )}
+                    <span className="absolute top-1 left-1.5 text-[9px] text-white/30 font-mono">Z{i + 1}</span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       )}

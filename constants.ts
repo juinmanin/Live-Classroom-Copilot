@@ -335,7 +335,12 @@ Your response language must be: {{LANGUAGE}}.
   "zones": [
     {"zone": 1, "engagement": number, "behavior": string},
     {"zone": 2, "engagement": number, "behavior": string},
-    ...
+    {"zone": 3, "engagement": number, "behavior": string},
+    {"zone": 4, "engagement": number, "behavior": string},
+    {"zone": 5, "engagement": number, "behavior": string},
+    {"zone": 6, "engagement": number, "behavior": string},
+    {"zone": 7, "engagement": number, "behavior": string},
+    {"zone": 8, "engagement": number, "behavior": string},
     {"zone": 9, "engagement": number, "behavior": string}
   ],
   "insight": string,
