@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "package": "node create-release-zip.js"
   },
   "dependencies": {
     "@google/genai": "^0.2.0",
@@ -20,6 +21,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.2.1",
+    "archiver": "^7.0.1",
     "typescript": "^5.3.3",
     "vite": "^5.1.4"
   }
