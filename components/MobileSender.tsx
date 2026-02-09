@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Peer from 'peerjs';
-import { Wifi, WifiOff, RefreshCw, Smartphone, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, Smartphone, AlertCircle, Battery, ArrowUp } from 'lucide-react';
 import { PEER_CONFIG } from '../utils/peerConfig';
 
 interface MobileSenderProps {
@@ -10,8 +10,28 @@ interface MobileSenderProps {
 const MobileSender: React.FC<MobileSenderProps> = ({ hostId }) => {
   const [status, setStatus] = useState<'init' | 'connecting' | 'streaming' | 'error'>('init');
   const [errorMsg, setErrorMsg] = useState('');
+  const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<Peer | null>(null);
+
+  // Battery API
+  useEffect(() => {
+    const getBattery = async () => {
+      try {
+        const nav = navigator as any;
+        if (nav.getBattery) {
+          const battery = await nav.getBattery();
+          setBatteryLevel(Math.round(battery.level * 100));
+          battery.addEventListener('levelchange', () => {
+            setBatteryLevel(Math.round(battery.level * 100));
+          });
+        }
+      } catch (e) {
+        // Battery API not available
+      }
+    };
+    getBattery();
+  }, []);
 
   useEffect(() => {
     // Prevent double execution in strict mode
@@ -103,9 +123,18 @@ const MobileSender: React.FC<MobileSenderProps> = ({ hostId }) => {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Top Status Bar */}
       {status === 'streaming' && (
-        <div className="absolute top-6 left-6 z-20 bg-green-500/90 backdrop-blur text-white px-4 py-1.5 rounded-full text-sm font-bold flex items-center shadow-lg animate-pulse">
-            <Wifi className="w-4 h-4 mr-2" /> LIVE
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 bg-black/60 backdrop-blur">
+            <div className="bg-green-500/90 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center shadow-lg animate-pulse">
+                <Wifi className="w-3.5 h-3.5 mr-1.5" /> LIVE
+            </div>
+            {batteryLevel !== null && (
+                <div className={`flex items-center space-x-1.5 text-xs font-semibold ${batteryLevel > 20 ? 'text-green-400' : 'text-red-400'}`}>
+                    <Battery className="w-4 h-4" />
+                    <span>{batteryLevel}%</span>
+                </div>
+            )}
         </div>
       )}
 
@@ -118,6 +147,23 @@ const MobileSender: React.FC<MobileSenderProps> = ({ hostId }) => {
             playsInline 
             autoPlay 
         />
+        
+        {/* Angle Guide Overlay (when streaming) */}
+        {status === 'streaming' && (
+          <div className="absolute inset-0 pointer-events-none z-10">
+            {/* Center crosshair guide */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-48 h-36 border-2 border-dashed border-white/20 rounded-xl" />
+            </div>
+            {/* Angle tip */}
+            <div className="absolute top-16 left-0 right-0 flex justify-center">
+              <div className="bg-black/40 backdrop-blur px-3 py-1.5 rounded-full flex items-center space-x-1.5 text-white/60 text-[11px]">
+                <ArrowUp className="w-3 h-3" />
+                <span>Tilt slightly upward toward students</span>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Overlay Status */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
@@ -144,7 +190,7 @@ const MobileSender: React.FC<MobileSenderProps> = ({ hostId }) => {
             )}
 
             {status === 'streaming' && (
-                <div className="absolute bottom-12 bg-black/50 backdrop-blur px-4 py-2 rounded-lg text-white/80 text-sm flex items-center border border-white/10">
+                <div className="absolute bottom-8 bg-black/50 backdrop-blur px-4 py-2 rounded-lg text-white/80 text-sm flex items-center border border-white/10">
                     <Smartphone className="w-4 h-4 mr-2" />
                     Transmitting to Dashboard
                 </div>

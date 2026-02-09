@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ShieldCheck, Activity, Smartphone, Signal } from 'lucide-react';
 import Peer from 'peerjs';
 import { GeminiService } from '../services/geminiService';
-import { AppLanguage, AIAnalysisResult } from '../types';
+import { AppLanguage, AIAnalysisResult, ZoneScore, Sensitivity } from '../types';
 import { TRANSLATIONS } from '../constants';
 import { PEER_CONFIG } from '../utils/peerConfig';
 
@@ -10,6 +10,7 @@ interface LiveMonitorProps {
   isActive: boolean;
   apiKey: string;
   language: AppLanguage;
+  sensitivity: Sensitivity;
   onAnalysisComplete: (result: AIAnalysisResult) => void;
   onPeerIdGenerated: (id: string) => void;
 }
@@ -18,6 +19,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
   isActive,
   apiKey,
   language,
+  sensitivity,
   onAnalysisComplete,
   onPeerIdGenerated
 }) => {
@@ -30,6 +32,7 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [geminiService, setGeminiService] = useState<GeminiService | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'waiting' | 'connected'>('disconnected');
+  const [zones, setZones] = useState<ZoneScore[]>([]);
 
   // 1. Initialize Gemini Service (also for demo mode without API key)
   useEffect(() => {
@@ -150,15 +153,19 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
       const result = await geminiService.analyzeFrame(
         base64Image,
         language,
-        "Class session running."
+        "Class session running.",
+        sensitivity
       );
+      if (result.zones) {
+        setZones(result.zones);
+      }
       onAnalysisComplete(result);
     } catch (err) {
       console.error("Analysis loop error:", err);
     } finally {
       setIsProcessing(false);
     }
-  }, [geminiService, isProcessing, language, onAnalysisComplete]);
+  }, [geminiService, isProcessing, language, sensitivity, onAnalysisComplete]);
 
   const t = TRANSLATIONS[language];
 
@@ -179,16 +186,33 @@ const LiveMonitor: React.FC<LiveMonitorProps> = ({
       {/* AI Processing Canvas (hidden) */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Animated Privacy Overlay */}
+      {/* Animated Privacy Overlay with 3x3 Zone Grid */}
       {connectionStatus === 'connected' && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Scanning line animation */}
           <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent animate-scan-line" />
-          {/* Grid overlay */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'linear-gradient(rgba(56, 189, 248, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.3) 1px, transparent 1px)',
-            backgroundSize: '40px 40px'
-          }} />
+          {/* 3x3 Zone Grid Overlay */}
+          <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+            {Array.from({ length: 9 }, (_, i) => {
+              const zoneData = zones.find(z => z.zone === i + 1);
+              const eng = zoneData?.engagement ?? 0;
+              const behavior = zoneData?.behavior ?? '';
+              const bgColor = eng >= 70 ? 'bg-green-500/10' : eng >= 40 ? 'bg-amber-500/10' : 'bg-red-500/10';
+              const borderColor = eng >= 70 ? 'border-green-400/30' : eng >= 40 ? 'border-amber-400/30' : 'border-red-400/30';
+              const textColor = eng >= 70 ? 'text-green-400' : eng >= 40 ? 'text-amber-400' : 'text-red-400';
+              return (
+                <div key={i} className={`relative border ${borderColor} ${zones.length > 0 ? bgColor : ''} flex items-center justify-center transition-colors duration-500`}>
+                  {zones.length > 0 && (
+                    <div className="flex flex-col items-center">
+                      <span className={`text-lg sm:text-2xl font-bold ${textColor} drop-shadow-lg`}>{eng}%</span>
+                      <span className="text-[9px] sm:text-[10px] text-white/60 uppercase tracking-wider mt-0.5">{behavior}</span>
+                    </div>
+                  )}
+                  <span className="absolute top-1 left-1.5 text-[9px] text-white/30 font-mono">Z{i + 1}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

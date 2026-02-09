@@ -37,7 +37,21 @@ export const TRANSLATIONS = {
     statusGreen: "Class is flowing well",
     statusYellow: "Attention Needed",
     statusRed: "Intervention Required",
-    demoBadge: "Simulated Demo"
+    demoBadge: "Simulated Demo",
+    smartAssistant: "Smart Assistant",
+    zoneGrid: "Zone Analysis",
+    sensitivity: "Sensitivity",
+    sensitivityHigh: "High",
+    sensitivityMedium: "Medium",
+    sensitivityLow: "Low",
+    actionQuiz: "Quick Quiz",
+    actionMotivate: "Motivate",
+    actionStretch: "Stretch Break",
+    actionCards: "Action Cards",
+    batteryLevel: "Battery",
+    angleGuide: "Angle Guide",
+    streaming: "Streaming",
+    tiltUp: "Tilt phone slightly upward"
   },
   [AppLanguage.KO]: {
     title: "실시간 교실 코파일럿",
@@ -62,7 +76,21 @@ export const TRANSLATIONS = {
     statusGreen: "수업이 원활합니다",
     statusYellow: "주의가 필요합니다",
     statusRed: "개입이 필요합니다",
-    demoBadge: "시뮬레이션 모드"
+    demoBadge: "시뮬레이션 모드",
+    smartAssistant: "스마트 어시스턴트",
+    zoneGrid: "구역 분석",
+    sensitivity: "감도",
+    sensitivityHigh: "높음",
+    sensitivityMedium: "보통",
+    sensitivityLow: "낮음",
+    actionQuiz: "즉석 퀴즈",
+    actionMotivate: "동기부여",
+    actionStretch: "스트레칭",
+    actionCards: "액션 카드",
+    batteryLevel: "배터리",
+    angleGuide: "각도 안내",
+    streaming: "스트리밍 중",
+    tiltUp: "폰을 약간 위로 기울이세요"
   },
   [AppLanguage.JA]: {
     title: "ライブ教室コパイロット",
@@ -87,7 +115,21 @@ export const TRANSLATIONS = {
     statusGreen: "順調に進行中",
     statusYellow: "注意が必要です",
     statusRed: "介入が必要です",
-    demoBadge: "シミュレーション"
+    demoBadge: "シミュレーション",
+    smartAssistant: "スマートアシスタント",
+    zoneGrid: "ゾーン分析",
+    sensitivity: "感度",
+    sensitivityHigh: "高",
+    sensitivityMedium: "中",
+    sensitivityLow: "低",
+    actionQuiz: "クイック クイズ",
+    actionMotivate: "モチベーション",
+    actionStretch: "ストレッチ",
+    actionCards: "アクションカード",
+    batteryLevel: "バッテリー",
+    angleGuide: "角度ガイド",
+    streaming: "ストリーミング中",
+    tiltUp: "スマホを少し上に傾けてください"
   },
   [AppLanguage.ZH]: {
     title: "实时课堂助手",
@@ -112,7 +154,21 @@ export const TRANSLATIONS = {
     statusGreen: "课堂进行顺利",
     statusYellow: "需要注意",
     statusRed: "需要干预",
-    demoBadge: "模拟演示"
+    demoBadge: "模拟演示",
+    smartAssistant: "智能助手",
+    zoneGrid: "区域分析",
+    sensitivity: "灵敏度",
+    sensitivityHigh: "高",
+    sensitivityMedium: "中",
+    sensitivityLow: "低",
+    actionQuiz: "快速测验",
+    actionMotivate: "激励",
+    actionStretch: "伸展休息",
+    actionCards: "操作卡",
+    batteryLevel: "电池",
+    angleGuide: "角度指南",
+    streaming: "传输中",
+    tiltUp: "请将手机稍微向上倾斜"
   },
   [AppLanguage.ES]: {
     title: "Copiloto de Aula en Vivo",
@@ -137,7 +193,21 @@ export const TRANSLATIONS = {
     statusGreen: "La clase fluye bien",
     statusYellow: "Atención Necesaria",
     statusRed: "Intervención Requerida",
-    demoBadge: "Modo Simulado"
+    demoBadge: "Modo Simulado",
+    smartAssistant: "Asistente Inteligente",
+    zoneGrid: "Análisis de Zonas",
+    sensitivity: "Sensibilidad",
+    sensitivityHigh: "Alta",
+    sensitivityMedium: "Media",
+    sensitivityLow: "Baja",
+    actionQuiz: "Quiz Rápido",
+    actionMotivate: "Motivar",
+    actionStretch: "Pausa Activa",
+    actionCards: "Tarjetas de Acción",
+    batteryLevel: "Batería",
+    angleGuide: "Guía de Ángulo",
+    streaming: "Transmitiendo",
+    tiltUp: "Inclina el teléfono ligeramente hacia arriba"
   },
   [AppLanguage.FR]: {
     title: "Copilote de Classe en Direct",
@@ -162,7 +232,21 @@ export const TRANSLATIONS = {
     statusGreen: "Le cours se déroule bien",
     statusYellow: "Attention Requise",
     statusRed: "Intervention Requise",
-    demoBadge: "Simulation"
+    demoBadge: "Simulation",
+    smartAssistant: "Assistant Intelligent",
+    zoneGrid: "Analyse des Zones",
+    sensitivity: "Sensibilité",
+    sensitivityHigh: "Haute",
+    sensitivityMedium: "Moyenne",
+    sensitivityLow: "Basse",
+    actionQuiz: "Quiz Rapide",
+    actionMotivate: "Motiver",
+    actionStretch: "Pause Étirement",
+    actionCards: "Cartes d'Action",
+    batteryLevel: "Batterie",
+    angleGuide: "Guide d'Angle",
+    streaming: "En diffusion",
+    tiltUp: "Inclinez légèrement le téléphone vers le haut"
   },
   [AppLanguage.HI]: {
     title: "लाइव क्लासरूम कोपायलट",
@@ -187,39 +271,80 @@ export const TRANSLATIONS = {
     statusGreen: "कक्षा अच्छी चल रही है",
     statusYellow: "ध्यान देने की आवश्यकता है",
     statusRed: "हस्तक्षेप आवश्यक",
-    demoBadge: "सिमुलेशन मोड"
+    demoBadge: "सिमुलेशन मोड",
+    smartAssistant: "स्मार्ट सहायक",
+    zoneGrid: "ज़ोन विश्लेषण",
+    sensitivity: "संवेदनशीलता",
+    sensitivityHigh: "उच्च",
+    sensitivityMedium: "मध्यम",
+    sensitivityLow: "निम्न",
+    actionQuiz: "त्वरित प्रश्नोत्तरी",
+    actionMotivate: "प्रेरित करें",
+    actionStretch: "स्ट्रेचिंग ब्रेक",
+    actionCards: "एक्शन कार्ड",
+    batteryLevel: "बैटरी",
+    angleGuide: "कोण गाइड",
+    streaming: "स्ट्रीमिंग",
+    tiltUp: "फ़ोन को थोड़ा ऊपर झुकाएं"
   }
 };
 
 export const SYSTEM_PROMPT_TEMPLATE = `
-You are an Expert Pedagogical Consultant.
-Analyze the provided blurred classroom frame.
+You are an Expert Pedagogical Consultant analyzing a classroom via a blurred privacy-processed frame.
 Output strictly in valid JSON format.
 Your response language must be: {{LANGUAGE}}.
 
-**Analysis Goals:**
-- **Engagement**: (0-100)
-- **Cognitive Load**: (0-100) High load means confusion/stress. Low load means boredom/relaxation.
-- **Mood**: One word summary.
-- **Insight**: A single sentence observation.
-- **Action**: A concrete, short pedagogical advice for the teacher.
-- **Alert Level**: 
-  - 'green' (Everything is fine, students are learning)
-  - 'yellow' (Minor distraction, chatting, or slight confusion)
-  - 'red' (Sleeping, chaos, fighting, or complete disengagement)
+**Analysis Framework:**
+
+1. **Overall Metrics:**
+   - **Engagement**: (0-100) Overall class engagement level.
+   - **Cognitive Load**: (0-100) High = confusion/stress, Low = boredom/relaxation.
+   - **Mood**: One word summary of classroom atmosphere.
+
+2. **9-Zone Grid Analysis:**
+   Divide the frame into a 3x3 grid (zones 1-9, left-to-right, top-to-bottom).
+   For each zone, estimate:
+   - **engagement**: (0-100) engagement level for that zone.
+   - **behavior**: One of: "focused", "note-taking", "distracted", "chatting", "phone-use", "sleeping", "confused", "empty"
+
+3. **Behavior Patterns to Detect:**
+   - Focused: Forward gaze, note-taking posture
+   - Attention needed: Chin resting, 5+ seconds gaze away, head down (drowsy)
+   - Intervention needed: Talking to neighbor (head turned), phone use, sleeping
+
+4. **Strategy Suggestion:**
+   - **Insight**: A specific observation mentioning the zone number if applicable.
+   - **Action**: A concrete, actionable pedagogical advice. Examples:
+     "Zone 7-9 engagement dropping, suggest 30-second stretch break"
+     "Overall attention below 40%, recommend switching to quiz mode"
+   - **Alert Level**:
+     - 'green': Learning is active
+     - 'yellow': Minor distraction, chatting, slight confusion
+     - 'red': Sleeping, chaos, complete disengagement
+
+**Sensitivity Level: {{SENSITIVITY}}**
+- high: Flag even minor distractions as yellow
+- medium: Standard threshold
+- low: Only flag significant disturbances
 
 **Output Schema:**
 {
   "engagement": number,
   "cognitiveLoad": number,
   "mood": string,
+  "zones": [
+    {"zone": 1, "engagement": number, "behavior": string},
+    {"zone": 2, "engagement": number, "behavior": string},
+    ...
+    {"zone": 9, "engagement": number, "behavior": string}
+  ],
   "insight": string,
   "action": string,
   "alertLevel": "green" | "yellow" | "red"
 }
 `;
 
-// Mock Scenarios for Demo Mode (Looping sequence)
+// Mock Scenarios for Demo Mode (Looping sequence with zone data)
 export const MOCK_SCENARIOS = [
   {
     engagement: 85,
@@ -227,7 +352,18 @@ export const MOCK_SCENARIOS = [
     mood: "Focused",
     alertLevel: "green",
     insight: "Students are attentively listening to the lecture.",
-    action: "Great time to introduce a key concept."
+    action: "Great time to introduce a key concept.",
+    zones: [
+      { zone: 1, engagement: 90, behavior: "focused" },
+      { zone: 2, engagement: 85, behavior: "note-taking" },
+      { zone: 3, engagement: 80, behavior: "focused" },
+      { zone: 4, engagement: 88, behavior: "focused" },
+      { zone: 5, engagement: 92, behavior: "note-taking" },
+      { zone: 6, engagement: 78, behavior: "focused" },
+      { zone: 7, engagement: 82, behavior: "focused" },
+      { zone: 8, engagement: 85, behavior: "note-taking" },
+      { zone: 9, engagement: 88, behavior: "focused" }
+    ]
   },
   {
     engagement: 70,
@@ -235,38 +371,93 @@ export const MOCK_SCENARIOS = [
     mood: "Curious",
     alertLevel: "green",
     insight: "Some students are taking notes, good flow.",
-    action: "Maintain this pace."
+    action: "Maintain this pace.",
+    zones: [
+      { zone: 1, engagement: 75, behavior: "note-taking" },
+      { zone: 2, engagement: 80, behavior: "focused" },
+      { zone: 3, engagement: 65, behavior: "focused" },
+      { zone: 4, engagement: 72, behavior: "note-taking" },
+      { zone: 5, engagement: 68, behavior: "focused" },
+      { zone: 6, engagement: 70, behavior: "note-taking" },
+      { zone: 7, engagement: 60, behavior: "focused" },
+      { zone: 8, engagement: 75, behavior: "note-taking" },
+      { zone: 9, engagement: 65, behavior: "focused" }
+    ]
   },
   {
     engagement: 55,
     cognitiveLoad: 30,
     mood: "Restless",
     alertLevel: "yellow",
-    insight: "Attention is starting to drift in the back rows.",
-    action: "Try asking a question to re-engage the class."
+    insight: "Zone 7-9: Attention drifting in back rows.",
+    action: "Try asking a question to re-engage the back of the class.",
+    zones: [
+      { zone: 1, engagement: 70, behavior: "focused" },
+      { zone: 2, engagement: 72, behavior: "note-taking" },
+      { zone: 3, engagement: 65, behavior: "focused" },
+      { zone: 4, engagement: 58, behavior: "focused" },
+      { zone: 5, engagement: 55, behavior: "distracted" },
+      { zone: 6, engagement: 50, behavior: "distracted" },
+      { zone: 7, engagement: 35, behavior: "chatting" },
+      { zone: 8, engagement: 40, behavior: "distracted" },
+      { zone: 9, engagement: 30, behavior: "phone-use" }
+    ]
   },
   {
     engagement: 40,
     cognitiveLoad: 20,
     mood: "Bored",
     alertLevel: "yellow",
-    insight: "Energy level has dropped significantly.",
-    action: "Time for a quick stretch or an interactive activity."
+    insight: "Energy level has dropped significantly across all zones.",
+    action: "Time for a quick stretch or an interactive activity.",
+    zones: [
+      { zone: 1, engagement: 45, behavior: "distracted" },
+      { zone: 2, engagement: 50, behavior: "focused" },
+      { zone: 3, engagement: 38, behavior: "distracted" },
+      { zone: 4, engagement: 42, behavior: "distracted" },
+      { zone: 5, engagement: 35, behavior: "chatting" },
+      { zone: 6, engagement: 30, behavior: "phone-use" },
+      { zone: 7, engagement: 25, behavior: "sleeping" },
+      { zone: 8, engagement: 40, behavior: "distracted" },
+      { zone: 9, engagement: 35, behavior: "chatting" }
+    ]
   },
   {
     engagement: 80,
     cognitiveLoad: 75,
     mood: "Intense",
     alertLevel: "green",
-    insight: "Students are working hard on the problem.",
-    action: "Walk around and offer individual support."
+    insight: "Students are working hard on the problem set.",
+    action: "Walk around and offer individual support.",
+    zones: [
+      { zone: 1, engagement: 85, behavior: "note-taking" },
+      { zone: 2, engagement: 82, behavior: "focused" },
+      { zone: 3, engagement: 78, behavior: "note-taking" },
+      { zone: 4, engagement: 80, behavior: "focused" },
+      { zone: 5, engagement: 88, behavior: "note-taking" },
+      { zone: 6, engagement: 75, behavior: "confused" },
+      { zone: 7, engagement: 72, behavior: "note-taking" },
+      { zone: 8, engagement: 80, behavior: "focused" },
+      { zone: 9, engagement: 78, behavior: "note-taking" }
+    ]
   },
   {
     engagement: 30,
     cognitiveLoad: 80,
     mood: "Confused",
     alertLevel: "red",
-    insight: "Many students look puzzled by the last explanation.",
-    action: "Pause and re-explain the concept with a simpler example."
+    insight: "Zone 4-6: Many students look puzzled by the last explanation.",
+    action: "Pause and re-explain the concept with a simpler example.",
+    zones: [
+      { zone: 1, engagement: 40, behavior: "confused" },
+      { zone: 2, engagement: 35, behavior: "confused" },
+      { zone: 3, engagement: 45, behavior: "distracted" },
+      { zone: 4, engagement: 20, behavior: "confused" },
+      { zone: 5, engagement: 25, behavior: "confused" },
+      { zone: 6, engagement: 18, behavior: "sleeping" },
+      { zone: 7, engagement: 30, behavior: "chatting" },
+      { zone: 8, engagement: 28, behavior: "phone-use" },
+      { zone: 9, engagement: 22, behavior: "sleeping" }
+    ]
   }
 ];

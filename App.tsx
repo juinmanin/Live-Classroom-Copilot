@@ -3,14 +3,15 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { 
-  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check, Key, Sparkles, Globe
+  Play, Square, Brain, AlertTriangle, ChevronDown, ChevronUp, Info, Copy, Check, Key, Sparkles, Globe,
+  Zap, Heart, StretchHorizontal, Settings2
 } from 'lucide-react';
 
 import LiveMonitor from './components/LiveMonitor';
 import StatCard from './components/StatCard';
 import LanguageSelector from './components/LanguageSelector';
 import MobileSender from './components/MobileSender';
-import { AppLanguage, AIAnalysisResult, ClassroomMetrics } from './types';
+import { AppLanguage, AIAnalysisResult, ClassroomMetrics, Sensitivity } from './types';
 import { TRANSLATIONS } from './constants';
 
 export default function App() {
@@ -26,6 +27,8 @@ export default function App() {
   const [showDashboard, setShowDashboard] = useState(true); 
   const [peerId, setPeerId] = useState<string>(''); 
   const [copied, setCopied] = useState(false);
+  const [sensitivity, setSensitivity] = useState<Sensitivity>('medium');
+  const [actionHistory, setActionHistory] = useState<{text: string, time: number}[]>([]);
   
   // Data
   const [metricsHistory, setMetricsHistory] = useState<ClassroomMetrics[]>([]);
@@ -86,6 +89,11 @@ export default function App() {
       const newHistory = [...prev, newMetric];
       return newHistory.slice(-20); 
     });
+
+    // Track action history for Smart Assistant timeline
+    if (result.action) {
+      setActionHistory(prev => [...prev.slice(-5), { text: result.action, time: Date.now() }]);
+    }
 
     // Trigger Notification for Events
     if (result.alertLevel === 'red' || result.alertLevel === 'yellow') {
@@ -226,7 +234,7 @@ export default function App() {
           </div>
       )}
 
-      <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 flex flex-col items-center">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 flex flex-col items-center">
         
         {/* Connection Panel (QR Code) - Shows only when active & not connected yet */}
         {isSessionActive && peerId && metricsHistory.length === 0 && (
@@ -285,6 +293,7 @@ export default function App() {
                 isActive={isSessionActive} 
                 apiKey={apiKey}
                 language={language}
+                sensitivity={sensitivity}
                 onAnalysisComplete={handleAnalysisComplete}
                 onPeerIdGenerated={setPeerId}
             />
@@ -302,30 +311,12 @@ export default function App() {
 
         {/* Dashboard / Metrics (Collapsible) */}
         {showDashboard && (
-            <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up pb-10">
+            <div className="w-full grid grid-cols-1 xl:grid-cols-4 gap-4 animate-slide-up pb-10">
                 
-                {/* Insights Column */}
-                <div className="lg:col-span-1 space-y-4">
-                    <div className={`bg-slate-800/80 backdrop-blur rounded-2xl p-6 border shadow-xl h-full flex flex-col transition-colors ${isDemoMode ? 'border-emerald-500/30' : 'border-slate-700'}`}>
-                        <h3 className={`${isDemoMode ? 'text-emerald-400' : 'text-indigo-400'} text-xs font-bold uppercase tracking-wider mb-4 flex items-center`}>
-                            {isDemoMode ? <Sparkles className="w-3 h-3 mr-2" /> : <Brain className="w-3 h-3 mr-2" />}
-                            {t.insight}
-                        </h3>
-                        <p className="text-white text-lg font-medium leading-relaxed flex-grow">
-                            {latestAnalysis?.insight || "Waiting for classroom data..."}
-                        </p>
-                        <div className="mt-6 pt-4 border-t border-slate-700 flex items-center justify-between">
-                            <span className="text-slate-500 text-xs font-medium uppercase tracking-wide">{t.mood}</span>
-                            <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${isDemoMode ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'}`}>
-                                {latestAnalysis?.metrics?.mood ?? '-'}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Metrics & Chart Column */}
-                <div className="lg:col-span-2 space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                {/* Left: Insights + Metrics (3 cols) */}
+                <div className="xl:col-span-3 space-y-4">
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-3 gap-4">
                         <StatCard 
                             title={t.engagement}
                             value={latestAnalysis?.metrics?.engagement ?? 0}
@@ -336,10 +327,28 @@ export default function App() {
                             value={latestAnalysis?.metrics?.cognitiveLoad ?? 0}
                             color="text-pink-400"
                         />
+                        <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg">
+                            <h3 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">{t.mood}</h3>
+                            <span className={`text-2xl font-bold ${isDemoMode ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                                {latestAnalysis?.metrics?.mood ?? '-'}
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-5 border border-slate-700 shadow-xl h-[240px]">
-                        <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">Live Trends (Last 5 min)</h3>
+                    {/* Insight Card */}
+                    <div className={`bg-slate-800/80 backdrop-blur rounded-2xl p-5 border shadow-xl transition-colors ${isDemoMode ? 'border-emerald-500/30' : 'border-slate-700'}`}>
+                        <h3 className={`${isDemoMode ? 'text-emerald-400' : 'text-indigo-400'} text-xs font-bold uppercase tracking-wider mb-3 flex items-center`}>
+                            {isDemoMode ? <Sparkles className="w-3 h-3 mr-2" /> : <Brain className="w-3 h-3 mr-2" />}
+                            {t.insight}
+                        </h3>
+                        <p className="text-white text-base font-medium leading-relaxed">
+                            {latestAnalysis?.insight || "Waiting for classroom data..."}
+                        </p>
+                    </div>
+
+                    {/* Live Trends Chart */}
+                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-5 border border-slate-700 shadow-xl h-[220px]">
+                        <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-3">Live Trends (Last 5 min)</h3>
                         <div className="h-full pb-8">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={metricsHistory}>
@@ -353,6 +362,78 @@ export default function App() {
                                     <Line type="monotone" dataKey="cognitiveLoad" stroke="#f472b6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
                                 </LineChart>
                             </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right: Smart Assistant Panel (1 col) */}
+                <div className="xl:col-span-1 space-y-4">
+                    {/* Sensitivity Setting */}
+                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-4 border border-slate-700 shadow-xl">
+                        <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3 flex items-center">
+                            <Settings2 className="w-3 h-3 mr-2" />
+                            {t.sensitivity}
+                        </h3>
+                        <div className="flex gap-2">
+                            {(['low', 'medium', 'high'] as Sensitivity[]).map((level) => (
+                                <button
+                                    key={level}
+                                    onClick={() => setSensitivity(level)}
+                                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                        sensitivity === level
+                                            ? level === 'high' ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                                            : level === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                                            : 'bg-green-500/20 text-green-400 border border-green-500/40'
+                                            : 'bg-slate-900 text-slate-500 border border-slate-700 hover:border-slate-600'
+                                    }`}
+                                >
+                                    {level === 'high' ? t.sensitivityHigh : level === 'medium' ? t.sensitivityMedium : t.sensitivityLow}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Action Cards */}
+                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-4 border border-slate-700 shadow-xl">
+                        <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3 flex items-center">
+                            <Zap className="w-3 h-3 mr-2" />
+                            {t.actionCards}
+                        </h3>
+                        <div className="space-y-2">
+                            <button className="w-full bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-95 flex items-center space-x-3">
+                                <Zap className="w-4 h-4" />
+                                <span>{t.actionQuiz}</span>
+                            </button>
+                            <button className="w-full bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/30 text-pink-300 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-95 flex items-center space-x-3">
+                                <Heart className="w-4 h-4" />
+                                <span>{t.actionMotivate}</span>
+                            </button>
+                            <button className="w-full bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-95 flex items-center space-x-3">
+                                <StretchHorizontal className="w-4 h-4" />
+                                <span>{t.actionStretch}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* AI Action Timeline */}
+                    <div className="bg-slate-800/80 backdrop-blur rounded-2xl p-4 border border-slate-700 shadow-xl">
+                        <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3 flex items-center">
+                            <Brain className="w-3 h-3 mr-2" />
+                            {t.smartAssistant}
+                        </h3>
+                        <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                            {actionHistory.length === 0 ? (
+                                <p className="text-slate-600 text-xs italic">Waiting for AI suggestions...</p>
+                            ) : (
+                                actionHistory.slice().reverse().map((item, i) => (
+                                    <div key={i} className="bg-slate-900/60 rounded-lg p-3 border border-slate-700/50">
+                                        <p className="text-white text-xs leading-relaxed">{item.text}</p>
+                                        <p className="text-slate-600 text-[10px] mt-1">
+                                            {new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                        </p>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

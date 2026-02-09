@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MODEL_NAME, SYSTEM_PROMPT_TEMPLATE, MOCK_SCENARIOS } from "../constants";
-import { AppLanguage, AIAnalysisResult } from "../types";
+import { AppLanguage, AIAnalysisResult, Sensitivity } from "../types";
 
 export class GeminiService {
   private ai: GoogleGenAI | null = null;
@@ -21,7 +21,8 @@ export class GeminiService {
   async analyzeFrame(
     base64Image: string,
     language: AppLanguage,
-    recentContext: string
+    recentContext: string,
+    sensitivity: Sensitivity = 'medium'
   ): Promise<AIAnalysisResult> {
     
     // DEMO MODE: If no API key is provided, run the simulation
@@ -29,16 +30,29 @@ export class GeminiService {
         return this.generateMockResponse(language);
     }
 
-    const systemInstruction = SYSTEM_PROMPT_TEMPLATE.replace('{{LANGUAGE}}', language);
+    const systemInstruction = SYSTEM_PROMPT_TEMPLATE
+      .replace('{{LANGUAGE}}', language)
+      .replace('{{SENSITIVITY}}', sensitivity);
     
     const userPrompt = `
       Analyze this live classroom frame.
       Recent Context (last 5 mins): ${recentContext}
+      Sensitivity level: ${sensitivity}
       
       Audio context: Teacher is speaking (Voice Activity Detected).
       
-      Provide the JSON analysis.
+      Provide the JSON analysis with 9-zone grid scores.
     `;
+
+    const zoneItemSchema = {
+      type: Type.OBJECT,
+      properties: {
+        zone: { type: Type.NUMBER },
+        engagement: { type: Type.NUMBER },
+        behavior: { type: Type.STRING }
+      },
+      required: ["zone", "engagement", "behavior"] as string[]
+    };
 
     try {
         const response = await this.ai.models.generateContent({
@@ -59,11 +73,12 @@ export class GeminiService {
                         engagement: { type: Type.NUMBER },
                         cognitiveLoad: { type: Type.NUMBER },
                         mood: { type: Type.STRING },
+                        zones: { type: Type.ARRAY, items: zoneItemSchema },
                         insight: { type: Type.STRING },
                         action: { type: Type.STRING },
                         alertLevel: { type: Type.STRING, enum: ["green", "yellow", "red"] }
                     },
-                    required: ["engagement", "cognitiveLoad", "mood", "insight", "action", "alertLevel"]
+                    required: ["engagement", "cognitiveLoad", "mood", "zones", "insight", "action", "alertLevel"]
                 }
             }
         });
@@ -80,6 +95,7 @@ export class GeminiService {
             cognitiveLoad: rawData.cognitiveLoad,
             mood: rawData.mood
           },
+          zones: rawData.zones,
           insight: rawData.insight,
           action: rawData.action,
           alertLevel: rawData.alertLevel
@@ -100,10 +116,6 @@ export class GeminiService {
     const scenario = MOCK_SCENARIOS[this.mockIndex];
     this.mockIndex = (this.mockIndex + 1) % MOCK_SCENARIOS.length;
 
-    // TODO: Implement proper translation logic for mock data if needed. 
-    // For now, we return English mock data or simple static translations could be mapped here.
-    // In a full app, MOCK_SCENARIOS should be localized in constants.ts
-
     return {
         metrics: {
             timestamp: Date.now(),
@@ -111,6 +123,10 @@ export class GeminiService {
             cognitiveLoad: Math.round(scenario.cognitiveLoad + (Math.random() * 10 - 5)),
             mood: scenario.mood
         },
+        zones: scenario.zones.map(z => ({
+            ...z,
+            engagement: Math.round(z.engagement + (Math.random() * 10 - 5))
+        })),
         insight: scenario.insight,
         action: scenario.action,
         alertLevel: scenario.alertLevel as 'green' | 'yellow' | 'red'
