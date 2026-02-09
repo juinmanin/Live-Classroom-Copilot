@@ -13,25 +13,6 @@ import archiver from 'archiver';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Files and directories to include
-const INCLUDE_PATTERNS = [
-  'components/**/*',
-  'services/**/*',
-  'utils/**/*',
-  'App.tsx',
-  'index.tsx',
-  'index.html',
-  'constants.ts',
-  'types.ts',
-  'package.json',
-  'tsconfig.json',
-  'vite.config.ts',
-  'netlify.toml',
-  'metadata.json',
-  'README.md',
-  '.gitignore'
-];
-
 // Directories to exclude
 const EXCLUDE_DIRS = [
   'node_modules',
@@ -39,7 +20,8 @@ const EXCLUDE_DIRS = [
   'dist-ssr',
   '.git',
   '.vscode',
-  '.idea'
+  '.idea',
+  'release'
 ];
 
 // File extensions to exclude
